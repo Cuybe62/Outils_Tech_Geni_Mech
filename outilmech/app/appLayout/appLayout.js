@@ -4,6 +4,7 @@ import Item from "./item";
 import { useEffect, useState } from "react";
 import "./style.css";
 import Footer from "./footer";
+import Avatar from "./Avatar";
 export default function AppLayout({ children }) {
   const { isMobile, isTablet, isDesktop } = useResponsive();
   const [mounted, setMounted] = useState(false);
@@ -21,7 +22,7 @@ export default function AppLayout({ children }) {
           <div className="drawer lg:drawer-open ">
             <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content ">
-              <nav className=" shadow navbar w-full bg-base-300  ">
+              <nav className=" shadow  navbar w-full bg-base-300  ">
                 <label
                   htmlFor="my-drawer-4"
                   aria-label="open sidebar"
@@ -42,7 +43,7 @@ export default function AppLayout({ children }) {
                     <path d="M14 10l2 2l-2 2"></path>
                   </svg>
                 </label>
-                <div className="px-4">Navbar Title</div>
+                <div className=" px-4">Navbar Title</div>
               </nav>
 
               <div className=" flex flex-col min-h-screen  px-0 py-0">
@@ -58,8 +59,14 @@ export default function AppLayout({ children }) {
                 className="drawer-overlay"
               ></label>
 
-              <div className=" shadow flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
-                <Item name="homePage"></Item>
+              <div className=" shadow flex h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
+                <div className=" w-auto h-2/10 ">
+                  <Item name="homePage"></Item>
+                </div>
+                <div className="Window w-full h-6/10 "></div>
+                <div className="user w-full h-2/10 p-2 flex">
+                  <Avatar></Avatar>
+                </div>
               </div>
             </div>
           </div>

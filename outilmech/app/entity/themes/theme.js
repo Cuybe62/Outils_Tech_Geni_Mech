@@ -1,5 +1,6 @@
 export class Theme {
-  constructor(name, description, img, methods) {
+  constructor(id, name, description, img, methods) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.img = img;

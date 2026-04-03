@@ -1,0 +1,12 @@
+.card {
+  border: solid 2px black;
+  border-radius: 10%;
+  overflow: hidden;
+}
+.card img {
+  mix-blend-mode: multiply;
+  object-fit: none;
+  border-radius: 10%;
+
+  clip-path: inset(10px 10px 10px 10px);
+}
