@@ -26,8 +26,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full ">
         <main>
           <AppLayout>
-            {" "}
-            <div className="p-6">{children}</div>
+            <div className="p-2">{children}</div>
           </AppLayout>
         </main>
       </body>

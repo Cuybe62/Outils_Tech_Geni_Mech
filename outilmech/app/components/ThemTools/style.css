@@ -1,12 +1,41 @@
 .card {
-  border: solid 2px black;
   border-radius: 10%;
   overflow: hidden;
+  background-color: #a2d2ff;
+  border: solid 1px blue;
 }
-.card img {
+.img_card {
   mix-blend-mode: multiply;
   object-fit: none;
   border-radius: 10%;
-
   clip-path: inset(10px 10px 10px 10px);
+}
+
+.dsp {
+  display: none;
+  background-color: gray;
+  opacity: 75%;
+}
+
+.dsp_text {
+  display: none;
+  color: white;
+  opacity: 100%;
+}
+
+.btn_card {
+  background-color: #a2d2ff;
+  color: white;
+}
+
+.btn_card:hover {
+  background-color: #70baff;
+}
+
+.card:hover .dsp {
+  display: block;
+}
+
+.card:hover .dsp_text {
+  display: block;
 }

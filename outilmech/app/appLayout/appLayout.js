@@ -43,7 +43,19 @@ export default function AppLayout({ children }) {
                     <path d="M14 10l2 2l-2 2"></path>
                   </svg>
                 </label>
-                <div className=" px-4">Navbar Title</div>
+                <div className=" px-4">
+                  <div className="breadcrumbs text-sm">
+                    <ul>
+                      <li>
+                        <a>Home</a>
+                      </li>
+                      <li>
+                        <a>Documents</a>
+                      </li>
+                      <li>Add Document</li>
+                    </ul>
+                  </div>
+                </div>
               </nav>
 
               <div className=" flex flex-col min-h-screen  px-0 py-0">
