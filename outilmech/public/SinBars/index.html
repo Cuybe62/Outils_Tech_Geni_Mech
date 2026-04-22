@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simulateur Barre Sinus V4 Stable</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<div class="wrap">
+  <div class="app">
+    <aside class="panel pad">
+      <div class="title">SIMULATEUR BARRE SINUS V4</div>
+      <div class="subtitle">Métrologie · Mesure d’angle</div>
+      <div class="field"><label>Pièce</label><select id="pieceSelect"></select></div>
+      <div class="field"><label>Face sélectionnée</label><select id="faceSelect"></select></div>
+      <div class="field"><label>Mode</label><select id="modeSelect"><option value="training">Mode entraînement</option><option value="inspection">Mode inspection</option></select></div>
+      <div class="field"><label>Longueur barre sinus</label><select id="barLength"><option value="5">5.000 in</option><option value="10">10.000 in</option></select></div>
+      <div class="field"><label>Orientation pièce: <span id="rotLabel">0.0°</span></label><input id="pieceRotation" type="range" min="-180" max="180" step="0.1" value="0"></div>
+      <div class="field"><label>Rapporteur visuel: <span id="protLabel">0.0°</span></label><input id="protractorEstimate" type="range" min="0" max="90" step="0.1" value="0"><div class="small">Tu règles l’aiguille pour estimer l’angle observé.</div></div>
+      <div class="field"><label>Lecture vraie de la face</label><div id="leftTrueAngle" class="badge">—</div></div>
+      <div class="field"><label>Hauteur théorique</label><div id="leftTheoretical" class="badge">0.0000 in</div></div>
+      <div class="field"><label>Face rapide</label><div class="face-buttons" id="faceButtons"></div></div>
+    </aside>
+
+    <main class="scene-panel">
+      <div class="toolbar">
+        <div class="stepbar panel">
+          <div>1. Rapporteur</div><div>2. Positionnement</div><div>3. Réglage cales</div><div class="active">4. Inspection</div>
+        </div>
+        <div class="mode-switch">
+          <button id="trainingBtn" class="active">Mode entraînement</button>
+          <button id="inspectionBtn">Mode inspection</button>
+          <button id="newCaseBtn">Nouveau cas</button>
+        </div>
+      </div>
+      <div class="hint" id="hintBox">Réglez la hauteur des cales pour que la face sélectionnée soit horizontale. Utilisez le trusquin et le comparateur pour vérifier la planéité.</div>
+      <canvas id="scene" width="1200" height="700"></canvas>
+      <div class="bottom-stats panel pad">
+        <div class="stat"><div class="k">Hauteur actuelle (cales)</div><div class="v" id="actualHeightStat">0.0000 in</div></div>
+        <div class="stat"><div class="k">Hauteur théorique</div><div class="v" id="theoreticalHeightStat">0.0000 in</div></div>
+        <div class="stat"><div class="k">Écart hauteur</div><div class="v" id="heightErrorStat">0.0000 in</div></div>
+        <div class="stat"><div class="k">Écart angulaire</div><div class="v" id="angleErrorStat">0.000°</div></div>
+      </div>
+      <div class="middle-controls panel pad">
+        <div class="subpanel">
+          <div class="title" style="font-size:1rem">Positionnement</div>
+          <div class="field"><label>Rotation pièce fine</label><button id="snapFaceBtn">Aligner automatiquement la face</button></div>
+          <div class="field"><label>Trusquin X: <span id="gageXLabel">2.500 in</span></label><input id="gageX" type="range" min="-1" max="12" step="0.01" value="2.5"></div>
+          <div class="field"><label>Trusquin Y: <span id="gageYLabel">3.000 in</span></label><input id="gageY" type="range" min="0" max="6" step="0.001" value="3"></div>
+          <div class="field"><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="zeroBtn" class="success">Mettre à zéro</button><button id="clearZeroBtn">Effacer zéro</button></div></div>
+        </div>
+        <div class="subpanel">
+          <div class="title" style="font-size:1rem">Jeu de cales impériales</div>
+          <div class="small">Clique une cale pour l’ajouter. Clique une cale verte pour la retirer.</div>
+          <div class="stack-grid" id="blockGrid" style="margin-top:10px"></div>
+          <div class="field"><label>Hauteur des cales (empilage)</label><div class="selected-stack" id="selectedStack"></div></div>
+          <div class="field"><label>Entrée manuelle</label><input id="manualHeight" type="number" step="0.0001" placeholder="Ex: 2.8670"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button id="autoSuggestionBtn">Suggestion auto</button><button id="clearBlocksBtn" class="danger">Effacer tout</button></div>
+        </div>
+        <div class="subpanel">
+          <div class="title" style="font-size:1rem">Trusquin & comparateur</div>
+          <div style="display:flex;justify-content:center;margin-top:8px"><canvas id="dialCanvas" width="220" height="220" style="width:220px;height:220px;background:transparent;border:none"></canvas></div>
+          <div class="dial-value" id="dialValue">+0.0000 in</div>
+          <div class="status">
+            <div class="row"><span>Contact</span><strong id="contactValue">Non</strong></div>
+            <div class="row"><span>Tendance</span><strong id="trendValue">—</strong></div>
+            <div class="row"><span>Variation max</span><strong id="maxVarValue">0.0000 in</strong></div>
+            <div class="row"><span>Variation min</span><strong id="minVarValue">0.0000 in</strong></div>
+            <div class="row"><span>Variation totale</span><strong id="totalVarValue">0.0000 in</strong></div>
+            <div class="row"><span>Évaluation</span><strong id="evalValue">—</strong></div>
+          </div>
+          <div class="legend-note">La pièce ne peut pas traverser la barre sinus. Le solveur la projette toujours au-dessus de la surface de support.</div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel pad">
+      <div class="title">Lecture atelier</div>
+      <div class="subtitle">Infos utiles pendant l’inspection</div>
+      <div class="status">
+        <div class="row"><span>Face active</span><strong id="faceNameInfo">—</strong></div>
+        <div class="row"><span>Angle cible</span><strong id="targetAngleInfo">—</strong></div>
+        <div class="row"><span>Lecture rapporteur</span><strong id="protractorInfo">0.0°</strong></div>
+        <div class="row"><span>Zéro comparateur</span><strong id="zeroInfo">Non défini</strong></div>
+        <div class="row"><span>Face réellement touchée</span><strong id="hitFaceInfo">—</strong></div>
+      </div>
+      <div style="margin-top:16px"><div class="title" style="font-size:1rem">État</div><div id="statusBadge" class="badge warn" style="margin-top:8px">Prêt</div></div>
+      <div style="margin-top:16px"><div class="title" style="font-size:1rem">Rappel</div><div class="small" style="line-height:1.5">1. Choisis une face.<br>2. Estime l’angle au rapporteur.<br>3. Ajuste les cales.<br>4. Mets le comparateur à zéro.<br>5. Balaye la face avec le trusquin.<br>6. Si la lecture varie, la face n’est pas plane par rapport à l’horizontale.</div></div>
+    </aside>
+  </div>
+</div>
+<script src="./app.js"></script>
+</body>
+</html>
