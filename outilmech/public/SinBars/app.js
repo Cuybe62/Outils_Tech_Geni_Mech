@@ -59,15 +59,14 @@
     return {chosen,total:chosen.reduce((a,b)=>a+b,0),remaining};
   }
   function barAngleFromHeight(h){ return deg(Math.asin(clamp(h/state.barLength,-1,1))); }
-  function barTiltFromHeight(h){ return deg(Math.atan2(h, state.barLength)); }
 
   function supportSolveWorldPoints(){
     const raw = localPiecePoints().map(p=>rotatePoint(p,state.pieceRotation));
     const faceAngle = normalizeFaceAngle(edgeData(raw,state.faceIndex).angle);
     const h = currentHeight();
-    const barTilt = barTiltFromHeight(h);
+    const barAngle = barAngleFromHeight(h);
     const sign = faceAngle >= 0 ? 1 : -1;
-    const carryAngle = -sign * barTilt;
+    const carryAngle = -sign * barAngle;
     const pts = localPiecePoints().map(p=>rotatePoint(p,state.pieceRotation + carryAngle));
     const m = Math.tan(rad(carryAngle));
     let minGap = Infinity;
@@ -76,7 +75,7 @@
       if(gap < minGap) minGap = gap;
     }
     const translated = pts.map(p=>({x:p.x, y:p.y - minGap}));
-    return {points:translated,carryAngle};
+    return {points:translated,carryAngle,barAngle};
   }
 
   function topSurfaceAtX(pts,x){
@@ -158,8 +157,7 @@
     let minX=Infinity, maxX=-Infinity, maxY=-Infinity;
     pts.forEach(p=>{ minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); });
     const bounds={minX:Math.min(minX-2,-1.5), maxX:Math.max(maxX+6,state.barLength+4), minY:-0.5, maxY:maxY+2.5};
-    const currentH = currentHeight();
-    const barStart={x:0,y:0}, barEnd={x:state.barLength,y:currentH};
+    const barStart={x:0,y:0}, barEnd={x:state.barLength,y:Math.tan(rad(geom.carryAngle))*state.barLength};
     const tableY=toScene({x:0,y:-0.08},bounds).y;
     const pBar0=toScene(barStart,bounds), pBar1=toScene(barEnd,bounds);
 
@@ -181,7 +179,7 @@
     ctx.fillStyle="#8f949d"; ctx.fillRect(pBar0.x-baseW/2, tableY-baseH+12, baseW, baseH); ctx.fillRect(pBar1.x-baseW/2, tableY-baseH+12, baseW, baseH);
     ctx.strokeStyle="#5b6470"; ctx.strokeRect(pBar0.x-baseW/2, tableY-baseH+12, baseW, baseH); ctx.strokeRect(pBar1.x-baseW/2, tableY-baseH+12, baseW, baseH);
 
-    const h=currentHeight(), stackBaseX=pBar1.x+18, stackTopY=pBar1.y, stackBottomY=tableY+12;
+    const h=currentHeight(), stackBaseX=pBar0.x-18, stackTopY=pBar0.y, stackBottomY=tableY+12;
     if(h>0.00001){
       const pixelH=stackBottomY-stackTopY, parts=state.selectedBlocks.length ? [...state.selectedBlocks] : [h];
       let cursorY=stackBottomY;
